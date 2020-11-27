@@ -108,7 +108,7 @@ dir_path = '/data/zdj/java_project/'
 LOG_FORMAT = "%(levelname)s %(thread)d %(funcName)s %(message)s"
 logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT)
 
-if not os.path.exists(output_directory):
+if not os.path.exists(dir_path):
     logging.error("output directory not exist!")
 
 if os.path.isfile(url_file):
