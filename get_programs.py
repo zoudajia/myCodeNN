@@ -52,7 +52,7 @@ def write_files(file, line):
     return
 
 
-def download_programs(output_directory, program_link):
+def download_using_git(output_directory, program_link):
     """
     从GitHub上下载项目
     :param output_directory: 项目保存路径
@@ -92,7 +92,7 @@ def down_from_github(output_directory, program_links):
             else:
                 k = length - i
             try: 
-                threads = [threading.Thread(target=download_programs, args=(output_directory, program_links[i+j])) for j in range(k)]
+                threads = [threading.Thread(target=download_using_git, args=(output_directory, program_links[i+j])) for j in range(k)]
                 for thread in threads:
                     thread.start()
                 for thread in threads:
@@ -103,18 +103,52 @@ def down_from_github(output_directory, program_links):
         logging.critical("Unknown Error!")
 
 
+def download_programs(dir_path, url_file):
+    if not os.path.exists(dir_path):
+        logging.error("output directory not exist!")
+
+    if os.path.isfile(url_file):
+        with open(url_file, 'r', encoding='utf-8') as f:
+            url = [line.strip() for line in f.readlines()]
+    else:
+        logging.error("存放GitHub项目url的文件不存在")
+
+    down_from_github(dir_path, url)
+    return
+
+
+def copy_java_file(source_path, object_path):
+    """
+    从中source_path提取.java文件到object_path中
+    """
+    if not os.path.exists(source_path):
+        logging.error("源目录 %s 不存在", source_path)
+    if not os.path.exists(object_path):
+        logging.error("目的目录 %s 不存在", object_path)
+
+    g = os.walk(source_path)
+    for path,dir_list,file_list in g:
+        for file_name in file_list:
+            if file_name.endswith(".java"):              
+                try:
+                    source = os.path.join(path, file_name)
+                    target = object_path
+                    if os.path.isfile(target+file_name):
+                        new_file_name = "a" + file_name
+                        shutil.copyfile(source, target + new_file_name)
+                    else:    
+                        shutil.copy(source, target)
+                except IOError:
+                    logging.debug("Unable to copy file. %s", source)
+                except:
+                    logging.debug("Unexpected error: %s", sys.exc_info())
+    return
+
+
+path = os.getcwd()
 url_file = './clone_urls_6000.txt' 
 dir_path = '/data/zdj/java_project/'
 LOG_FORMAT = "%(levelname)s %(thread)d %(funcName)s %(message)s"
 logging.basicConfig(filename='my.log', level=logging.DEBUG, format=LOG_FORMAT)
-
-if not os.path.exists(dir_path):
-    logging.error("output directory not exist!")
-
-if os.path.isfile(url_file):
-    with open(url_file, 'r', encoding='utf-8') as f:
-        url = [line.strip() for line in f.readlines()]
-else:
-    logging.error("存放GitHub项目url的文件不存在")
-
-down_from_github(dir_path, url)
+dist_path = '/data/zdj/java_files/'
+copy_java_file(dir_path, dist_path)
