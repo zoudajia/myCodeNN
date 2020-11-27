@@ -133,9 +133,13 @@ def copy_java_file(source_path, object_path):
                 try:
                     source = os.path.join(path, file_name)
                     target = object_path
-                    if os.path.isfile(target+file_name):
-                        new_file_name = "a" + file_name
-                        shutil.copyfile(source, target + new_file_name)
+                    new_file = file_name
+                    if os.path.isfile(target + file_name):
+                        new_file = "a" + file_name
+                    while os.path.isfile(target + new_file):
+                        new_file = "a" + file_name
+                    if new_file != file_name:
+                        shutil.copyfile(source, target + new_file)
                     else:    
                         shutil.copy(source, target)
                 except IOError:
