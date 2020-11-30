@@ -9,14 +9,24 @@ torch.manual_seed(1)
 # lstm 单元输入和输出纬度都是3
 lstm = nn.LSTM(3, 3)
 # 生成一个长度为5，每一个元素为1*3的序列作为输入，这里的数字3对应于上句中第一个3
-inputs = [autograd.Variable(torch.randn((1,3))) for _ in range(5)]
+inputs = [autograd.Variable(torch.randn(1,3)) for _ in range(5)]
 
-# 设置隐藏层纬度，初始化隐藏层的数据
-hidden = (autograd.Variable(torch.randn(1, 1, 3)), autograd.Variable(torch.randn((1, 1, 3))))
+# 设置隐藏层纬度，初始化隐藏层的数据,hidden是一个元组
+hidden = (autograd.Variable(torch.randn(1, 1, 3)), autograd.Variable(torch.randn(1, 1, 3)))
 
-for i in inputs:
-    # Step through the sequence one element at a time.
-    # after each step, hidden contains the hidden state.
-    out, hidden = lstm(i.view(1, 1, -1), hidden)
+def way_1(inputs, hidden):
+    for i in inputs:
+        # Step through the sequence one element at a time.
+        # after each step, hidden contains the hidden state.
+        out, hidden = lstm(i.view(1, 1, -1), hidden)
+        print(out)
+        print(hidden)
+
+def way_2(inputs, hidden):
+    inputs = torch.cat(inputs).view(len(inputs), 1, -1)
+    out, hidden = lstm(inputs, hidden)
     print(out)
     print(hidden)
+
+
+way_2(inputs, hidden)
