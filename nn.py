@@ -29,4 +29,16 @@ def way_2(inputs, hidden):
     print(hidden)
 
 
-way_2(inputs, hidden)
+training_data = [
+    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
+    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
+]
+
+word_to_ix = {} # 单词的索引字典
+for sent, tags in training_data:
+    for word in sent:
+        if word not in word_to_ix:
+            word_to_ix[word] = len(word_to_ix)
+print(word_to_ix)
+tag_to_ix = {"DET": 0, "NN": 1, "V": 2} # 手工设定词性标签数据字典
+
